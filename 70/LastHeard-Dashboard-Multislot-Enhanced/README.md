@@ -17,4 +17,4 @@ or my website [oe7drt.com](https://oe7drt.com) is well appreciated.
 
 # Preview
 
-![screen previews](nxt07_screens.png)
+![screen previews](nxt07_01.png)
