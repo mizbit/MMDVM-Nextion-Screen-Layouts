@@ -1,0 +1,26 @@
+#!/bin/bash
+# This code was taken from Pi-Star (and maybe modified a bit)
+# https://github.com/AndyTaylorTweet/Pi-Star_Binaries_sbin/blob/master/pistar-hourly.cron
+
+echo -n "Shrinking MMDVM log..."
+# Shrink the MMDVMHost Log
+MMDVMLogFiles=$(ls /var/log/mmdvm/MMDVM-*.log 2> /dev/null | wc -l)
+if [[ "$MMDVMLogFiles" != "0" ]]; then
+  todayMMDVMLog=$(ls -1rt /var/log/mmdvm/MMDVM-*.log | tail -n1)
+  modemLine=$(grep "MMDVM protocol version" ${todayMMDVMLog} | tail -n 1)
+  if [ "$(head -n 1 ${todayMMDVMLog})" = "${modemLine}" ]; then
+    sed -i '1d' ${todayMMDVMLog}
+  fi
+  echo -e "${modemLine}\n$(egrep -h "from|end|watchdog|lost|protocol" ${todayMMDVMLog} | sed '/(CSBK|overflow|mapping points|Downlink)/d' | tail -n 500)" > ${todayMMDVMLog}
+  #echo -e "${modemLine}\n$(egrep -h "from|end|watchdog|lost|protocol" ${todayMMDVMLog} | sed '/(CSBK|overflow|mapping points|Downlink)/d' | tail -n 1000)" > ${todayMMDVMLog}
+fi
+
+echo -n " /var/log..."
+# Clean up systemd logs
+journalctl --rotate > /dev/null 2>&1
+#journalctl --vacuum-time=24h
+#journalctl --vacuum-size=5M
+journalctl --vacuum-time=6h > /dev/null 2>&1
+journalctl --vacuum-size=2M > /dev/null 2>&1
+
+echo " OK"

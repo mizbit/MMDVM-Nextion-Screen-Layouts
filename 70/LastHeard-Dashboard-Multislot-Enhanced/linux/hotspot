@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]
+  then echo "root privileges needed. Aborting."
+  exit 1
+fi
+
+case "$1" in
+  on)
+    systemctl start mmdvmhost.timer
+    systemctl start mmdvmhost.service
+    /usr/local/sbin/dashboard on
+    ;;
+
+  off)
+    systemctl stop mmdvmhost.timer
+    systemctl stop mmdvmhost.service
+    /usr/local/sbin/dashboard off
+    ;;
+  help)
+    echo "$(basename $0)"
+    echo " Enable or disable systemd services for MMDVMHost"
+    ;;
+  *)
+    echo "usage: $(basename $0) [ on | off ]"
+    exit 1
+esac

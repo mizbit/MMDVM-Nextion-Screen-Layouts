@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [ "$EUID" -ne 0 ]
+  then echo "root privileges needed. Aborting."
+  exit
+fi
+
+case "$1" in
+	start|on)
+	  echo -n "Starting the web dashboard..."
+    systemctl start php7.3-fpm.service
+    rm -f /var/www/html/index.html
+    echo " OK"
+  ;;
+
+	stop|off)
+	  echo -n "Stopping the web dashboard..."
+    cp -a /root/index.html /var/www/html/index.html
+    systemctl stop php7.3-fpm.service
+    echo " OK"
+  ;;
+
+	*)
+		echo $"Usage: $0 {start|stop}"
+		exit 1
+esac
